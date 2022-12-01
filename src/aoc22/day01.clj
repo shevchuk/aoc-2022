@@ -49,4 +49,14 @@
        (map sum-calories)
        (apply max)))
 
+
+(defn find-top3
+  [raw-data]
+  (->> raw-data
+       (parse-data)
+       (map sum-calories)
+       (sort)
+       (take-last 3)
+       (apply +)))
+
 (def data (slurp "./src/aoc22/day01.data"))
