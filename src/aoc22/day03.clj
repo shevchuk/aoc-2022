@@ -21,6 +21,12 @@ CrZsJsPPZsGzwwsLwLmpwMDw")
       (first (clojure.set/intersection comp1 comp2)))
   )
 
+
+(defn find-common-item-in-group
+  ""
+  [group]
+  (first (apply clojure.set/intersection (map #(into #{} %) group))))
+
 (defn p1 [data]
   (let [contents (str/split data #"\n")]
     (reduce +
@@ -28,3 +34,12 @@ CrZsJsPPZsGzwwsLwLmpwMDw")
                     (->> contents
                  (map find-common-item-in-rucksack)
                  (map #(get priorities %)))))))
+
+(defn p2 [data]
+  (let [contents (str/split data #"\n")]
+    (reduce +
+    (->> contents
+         (partition 3)
+         (map find-common-item-in-group)
+         (map #(get priorities %))))
+  ))
