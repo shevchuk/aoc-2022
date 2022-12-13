@@ -27,27 +27,6 @@
 
 (def input (slurp "src/aoc22/day13.dat"))
 
-(defn check-order-old [a b]
-  (cond
-    (and (int? a)
-         (int? b)) (<= a b)
-    (and (vector? a)
-         (vector? b)) (boolean
-                       (or
-                        (and (empty? a) (not (empty? b)))
-                        (if (and (not (some false? (map int? a)))
-                                 (not (some false? (map int? b))))
-                          (or (not (some false? (map < a b)))
-                              (and (not (some false? (map check-order a b)))
-                                   (<= (count a) (count b))))
-                          (and (not (some false? (map check-order a b)))
-                                   (<= (count a) (count b)))
-                          )))
-    (and (vector? a)
-         (int? b)) (check-order a [b])
-    (and (int? a)
-         (vector? b)) (check-order [a] b)
-    :else false))
 
 (defn fill-missing [a b]
   (let [m (max (count a) (count b))]
@@ -67,11 +46,13 @@
   )
 
 (defn check-order-int [a b]
+  ;(println a "  <----->  " b)
   (cond
     (and (int? a)
          (int? b)) (compare a b)
     (and (vector? a)
-         (vector? b)) (let [[a1 b1] (fill-missing a b)
+         (vector? b)) (if (= a b) 0
+                       (let [[a1 b1] (fill-missing a b)
                             res (map check-order-int a1 b1)
                             items-correct (take-while #(>= 0 %) res)]
                         (if (some neg? items-correct)
@@ -80,7 +61,7 @@
                             1
                             (if (= (count a) (count items-correct))
                               -1
-                              1))))
+                              1)))))
     (and (vector? a)
          (int? b)) (check-order-int a [b])
     (and (int? a)
@@ -101,3 +82,17 @@
         indices (map inc (range (count inp)))
         zipped (zipmap indices inp)]
     (reduce + (map first(filter #(apply check-order (second %)) zipped)))))
+
+(defn parse-input-2
+  [input]
+  (map read-string (str/split (str/replace input #"\n\n" "\n") #"\n"))
+  )
+
+(defn p2
+  ""
+  [input-raw]
+  (let [inp-initial       (parse-input-2 input-raw)
+        inp (into inp-initial [[[2]][[6]]])
+        sorted (sort check-order-int inp)
+        ]
+    (apply * (map inc [(.indexOf sorted [[2]]) (.indexOf sorted [[6]])]))))
